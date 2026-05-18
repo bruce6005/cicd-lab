@@ -1,0 +1,45 @@
+name: CI 313553034
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: Typecheck, Prettier, and Test
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      checks: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript typecheck
+        run: npm run typecheck
+
+      - name: Prettier check
+        run: npm run format:check
+
+      - name: Run tests
+        run: npm test -- --reporter=default --reporter=junit --outputFile=test-results/junit.xml
+
+      - name: Publish test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results
+          path: test-results/junit.xml
+          reporter: java-junit
