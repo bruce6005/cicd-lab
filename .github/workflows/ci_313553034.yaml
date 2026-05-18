@@ -38,7 +38,7 @@ jobs:
 
       - name: Publish test report
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() && hashFiles('test-results/junit.xml') != ''
         with:
           name: Unit Test Results
           path: test-results/junit.xml
